@@ -37,8 +37,8 @@ scene.add( cube );
 var render = function () {
   requestAnimationFrame( render );
 
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  // cube.rotation.x += 0.01;
+  // cube.rotation.y += 0.01;
 
   // Render the scene
   renderer.render(scene, camera);
