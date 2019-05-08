@@ -16,7 +16,7 @@ init();
 animate();
 
 function init() {
- 	container = document.createElement("div");
+	container = document.createElement("div");
 	document.body.appendChild(container);
 
 	// Create an empty scene
@@ -45,10 +45,10 @@ function init() {
 	scene.add(new THREE.AmbientLight(0xffffff));
 
 	// Add Rubiks cube
-  let cubes = rubik.allCubes;
-  for (let i = 0; i < cubes.length; i++) {
-  	scene.add(cubes[i]);
-  }
+	let cubes = rubik.allCubes;
+	for (let i = 0; i < cubes.length; i++) {
+		scene.add(cubes[i]);
+	}
 
 	// event listeners
 	window.addEventListener("resize", onWindowResize, false);
@@ -71,10 +71,10 @@ function animate() {
 }
 
 function render() {
-  let timer = Date.now() * 0.0002;
+	let timer = Date.now() * 0.0002;
 
-  camera.lookAt(scene.position);
+	camera.lookAt(scene.position);
 
-  // Render the scene
-  renderer.render(scene, camera);
+	// Render the scene
+	renderer.render(scene, camera);
 }
