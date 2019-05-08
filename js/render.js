@@ -9,11 +9,14 @@ var cubeObject;
 var cubeGeometry;
 var cubeMaterial;
 
+var DIMENSIONS = 3;
+var rubik = new Rubik(DIMENSIONS);
+
 init();
 animate();
 
 function init() {
-	container = document.createElement("div");
+ 	container = document.createElement("div");
 	document.body.appendChild(container);
 
 	// Create an empty scene
@@ -38,24 +41,14 @@ function init() {
 	// mouse controls
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
 
-	// lights (fourth thing you need is lights)
-	let light, materials;
-	scene.add(new THREE.AmbientLight(0x666666));
-	light = new THREE.DirectionalLight(0xdfebff, 1.75);
-	light.position.set(50, 200, 100);
-	light.position.multiplyScalar(1.3);
-	light.castShadow = true;
-	light.shadow.mapSize.width = 1024;
-	light.shadow.mapSize.height = 1024;
+	// lights
+	scene.add(new THREE.AmbientLight(0xffffff));
 
-	let d = 300;
-	light.shadow.camera.left = -d;
-	light.shadow.camera.right = d;
-	light.shadow.camera.top = d;
-	light.shadow.camera.bottom = -d;
-	light.shadow.camera.far = 1000;
-
-	scene.add(light);
+	// Add Rubiks cube
+  let cubes = rubik.allCubes;
+  for (let i = 0; i < cubes.length; i++) {
+  	scene.add(cubes[i]);
+  }
 
 	// event listeners
 	window.addEventListener("resize", onWindowResize, false);
@@ -79,11 +72,6 @@ function animate() {
 
 function render() {
   let timer = Date.now() * 0.0002;
-
-  let cubes = rubik.allCubes;
-  for (let i = 0; i < cubes.length; i++) {
-  	scene.add(cubes[i]);
-  }
 
   camera.lookAt(scene.position);
 
