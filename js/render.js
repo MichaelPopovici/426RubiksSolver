@@ -62,15 +62,6 @@ function init() {
 
 	scene.add(light);
 
-	// cube (Now we're going to create the cube)
-	// Create a Cube Mesh with basic material
-	cubeMaterial = new THREE.MeshBasicMaterial({ color: "#433F81" });
-	cubeGeometry = new THREE.BoxGeometry( 1, 1, 1 );
-	cubeObject = new THREE.Mesh(cubeGeometry, cubeMaterial);
-
-	// Add cube to Scene
-	scene.add(cubeObject);
-
 	// event listeners
 	window.addEventListener("resize", onWindowResize, false);
 }
@@ -86,6 +77,7 @@ function animate() {
 
 	time = Date.now();
 
+	simulate();
 	render();
 	stats.update();
 	controls.update();
@@ -94,8 +86,10 @@ function animate() {
 function render() {
   let timer = Date.now() * 0.0002;
 
-  cubeObject.rotation.x += 0.01;
-  cubeObject.rotation.y += 0.01;
+  let cubes = rubik.allCubes;
+  for (let i = 0; i < cubes.length; i++) {
+  	scene.add(cubes[i]);
+  }
 
   camera.lookAt(scene.position);
 
