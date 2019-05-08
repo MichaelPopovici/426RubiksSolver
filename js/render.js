@@ -1,7 +1,6 @@
 if (!Detector.webgl) Detector.addGetWebGLMessage();
 
 var container;
-var stats;
 var controls;
 var camera, scene, renderer;
 var time;
@@ -35,10 +34,6 @@ function init() {
 	renderer.gammaInput = true;
 	renderer.gammaOutput = true;
 	renderer.shadowMap.enabled = true;
-
-	// This gives us stats on how well the simulation is running
-	stats = new Stats();
-	container.appendChild(stats.domElement);
 
 	// mouse controls
 	controls = new THREE.TrackballControls(camera, renderer.domElement);
@@ -79,7 +74,6 @@ function animate() {
 
 	simulate();
 	render();
-	stats.update();
 	controls.update();
 }
 
