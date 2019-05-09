@@ -16,68 +16,74 @@ init();
 animate();
 
 function init() {
-	container = document.createElement("div");
-	document.body.appendChild(container);
+  container = document.createElement("div");
+  document.body.appendChild(container);
 
-	// Create an empty scene
-	scene = new THREE.Scene();
+  // Create an empty scene
+  scene = new THREE.Scene();
 
-	// axes for debugging
-	scene.add( new THREE.AxesHelper( 20 ) );
+  // Create a basic perspective camera
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+  camera.position.z = 4;
 
-	// Create a basic perspective camera
-	camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-	camera.position.z = 4;
+  scene.add(camera);
 
-	scene.add(camera);
+  // Create a renderer with Antialiasing
+  renderer = new THREE.WebGLRenderer({ antialias: true, devicePixelRatio: 1 });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0xcce0ff);
 
-	// Create a renderer with Antialiasing
-	renderer = new THREE.WebGLRenderer({ antialias: true, devicePixelRatio: 1 });
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.setClearColor(0xcce0ff);
+  container.appendChild(renderer.domElement);
+  renderer.gammaInput = true;
+  renderer.gammaOutput = true;
+  renderer.shadowMap.enabled = true;
 
-	container.appendChild(renderer.domElement);
-	renderer.gammaInput = true;
-	renderer.gammaOutput = true;
-	renderer.shadowMap.enabled = true;
+  // mouse controls
+  controls = new THREE.TrackballControls(camera, renderer.domElement);
 
-	// mouse controls
-	controls = new THREE.TrackballControls(camera, renderer.domElement);
+  // lights
+  scene.add(new THREE.AmbientLight(0xffffff));
 
-	// lights
-	scene.add(new THREE.AmbientLight(0xffffff));
+  // Add Rubik's cube
+  let cubes = rubik.cubes;
+  for (let i = 0; i < cubes.length; i++) {
+    scene.add(cubes[i]);
+  }
 
-	// Add Rubiks cube
-	let cubes = rubik.cubes;
-	for (let i = 0; i < cubes.length; i++) {
-		scene.add(cubes[i]);
-	}
+  // event listeners
+  addEventListeners();
+}
 
-	// event listeners
-	window.addEventListener("resize", onWindowResize, false);
+function addEventListeners() {
+  window.addEventListener("resize", onWindowResize, false);
+
+  // TODO: Allow user to select number of moves for shuffle
+  $("#button-shuffle").on('click', function(e) {
+    e.preventDefault();
+    rubik.shuffle(20);
+  });
 }
 
 function onWindowResize() {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
-	requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 
-	time = Date.now();
+  time = Date.now();
 
-	simulate();
-	render();
-	controls.update();
+  render();
+  controls.update();
 }
 
 function render() {
-	let timer = Date.now() * 0.0002;
+  let timer = Date.now() * 0.0002;
 
-	camera.lookAt(scene.position);
+  camera.lookAt(scene.position);
 
-	// Render the scene
-	renderer.render(scene, camera);
+  // Render the scene
+  renderer.render(scene, camera);
 }
