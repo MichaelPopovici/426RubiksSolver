@@ -28,6 +28,7 @@ function createCube(x, y, z) {
 }
 
 // return a list of cubes on the face described by axis and face.
+// (aka return the cubes we want to rotate)
 function getActiveCubes(cubes, axis, face) {
   var activeCubes = [];
   cubes.forEach(function(cube) {
