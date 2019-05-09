@@ -22,6 +22,9 @@ function init() {
 	// Create an empty scene
 	scene = new THREE.Scene();
 
+	// axes for debugging
+	scene.add( new THREE.AxesHelper( 20 ) );
+
 	// Create a basic perspective camera
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 	camera.position.z = 4;
@@ -45,7 +48,7 @@ function init() {
 	scene.add(new THREE.AmbientLight(0xffffff));
 
 	// Add Rubiks cube
-	let cubes = rubik.allCubes;
+	let cubes = rubik.cubes;
 	for (let i = 0; i < cubes.length; i++) {
 		scene.add(cubes[i]);
 	}
