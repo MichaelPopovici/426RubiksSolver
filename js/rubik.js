@@ -165,6 +165,43 @@ Rubik.prototype.executeMoves = function() {
   }
 }
 
+// https://ruwix.com/the-rubiks-cube/notation/
+// Rotate front face in given direction (1: clockwise, -1: counterclockwise)
+Rubik.prototype.rotateF = function(direction) {
+  this.moves.push(new Move(2, -1 * direction, 'z'));
+  this.executeMoves();
+}
+
+// Rotate back face in given direction (1: clockwise, -1: counterclockwise)
+Rubik.prototype.rotateB = function(direction) {
+  this.moves.push(new Move(0, 1 * direction, 'z'));
+  this.executeMoves();
+}
+
+// Rotate left face in given direction (1: clockwise, -1: counterclockwise)
+Rubik.prototype.rotateL = function(direction) {
+  this.moves.push(new Move(0, 1 * direction, 'x'));
+  this.executeMoves();
+}
+
+// Rotate right face in given direction (1: clockwise, -1: counterclockwise)
+Rubik.prototype.rotateR = function(direction) {
+  this.moves.push(new Move(2, -1 * direction, 'x'));
+  this.executeMoves();
+}
+
+// Rotate top face in given direction (1: clockwise, -1: counterclockwise)
+Rubik.prototype.rotateU = function(direction) {
+  this.moves.push(new Move(2, -1 * direction, 'y'));
+  this.executeMoves();
+}
+
+// Rotate bottom face in given direction (1: clockwise, -1: counterclockwise)
+Rubik.prototype.rotateD = function(direction) {
+  this.moves.push(new Move(0, 1 * direction, 'y'));
+  this.executeMoves();
+}
+
 // --------------------------------------------------------
 //                     RUBIK CONTROLS
 // --------------------------------------------------------

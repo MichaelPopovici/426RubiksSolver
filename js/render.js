@@ -8,7 +8,7 @@ var cubeObject;
 var cubeGeometry;
 var cubeMaterial;
 
-var DIMENSIONS = 3;
+var DIMENSIONS = 3; // default is a 3x3 cube
 var rubik;
 
 init();
