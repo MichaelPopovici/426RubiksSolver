@@ -9,7 +9,7 @@ var cubeGeometry;
 var cubeMaterial;
 
 var DIMENSIONS = 3;
-var rubik = new Rubik(DIMENSIONS);
+var rubik;
 
 init();
 animate();
@@ -44,13 +44,25 @@ function init() {
   scene.add(new THREE.AmbientLight(0xffffff));
 
   // Add Rubik's cube
+  addRubiksCube();
+
+  // event listeners
+  addEventListeners();
+}
+
+function addRubiksCube() {
+  rubik = new Rubik(DIMENSIONS);
   let cubes = rubik.cubes;
   for (let i = 0; i < cubes.length; i++) {
     scene.add(cubes[i]);
   }
+}
 
-  // event listeners
-  addEventListeners();
+function removeRubiksCube() {
+  let cubes = rubik.cubes;
+  for (let i = 0; i < cubes.length; i++) {
+    scene.remove(cubes[i]);
+  }
 }
 
 function addEventListeners() {
@@ -65,6 +77,14 @@ function addEventListeners() {
   $("#button-undo").on('click', function(e) {
     e.preventDefault();
     rubik.undo();
+  });
+
+  $("#button-reset").on('click', function(e) {
+    e.preventDefault();
+    if (! rubik.isMoving) {    
+      removeRubiksCube();
+      addRubiksCube();
+    }
   });
 }
 
