@@ -155,17 +155,24 @@ Rubik.prototype.executeMoves = function() {
   }
 }
 
+// --------------------------------------------------------
+//                        RUBIK CONTROLS
+// --------------------------------------------------------
 // n: number of moves to simulate during shuffle
 Rubik.prototype.shuffle = function(n) {
-  for (let i = 0; i < n; i++) {
-    var depth = randomInt(0, this.dimensions - 1);
-    var direction = randomDirection();
-    var axis = randomAxis();
+  if (! this.isMoving) {  
+    for (let i = 0; i < n; i++) {
+      var depth = randomInt(0, this.dimensions - 1);
+      var direction = randomDirection();
+      var axis = randomAxis();
 
-    var move = new Move(depth, direction, axis);
+      var move = new Move(depth, direction, axis);
 
-    this.moves.push(move);
+      this.moves.push(move);
+    }
+
+    this.executeMoves();
+  } else {
+    console.log("Already moving!");
   }
-
-  this.executeMoves();
 }
