@@ -91,6 +91,7 @@ function Rubik(dimensions) {
   this.isMoving = false; // is a move being executed?
   this.completedMoves = []; // stack of completed moves
   this.isUndoing = false; // are we undoing a move?
+  this.isSolving = false; // are we solving the Rubik's cube?
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (dimensions - 1) * len * 0.5;  
@@ -172,6 +173,7 @@ Rubik.prototype.moveComplete = function() {
   this.isUndoing = false;
   this.currentMove = {};
   this.activeCubes = [];
+  if (this.completedMoves.length === 0) this.isSolving = false;
   
   this.executeMoves(); // execute the next move
 }
@@ -216,9 +218,13 @@ Rubik.prototype.undo = function() {
     } else {
       console.log("Cube is reset!");
     }
-  } else {
-    console.log("Already moving!");
   }
+}
+
+// Naive Sovler - undo all moves
+// TODO: Write a generalised solve algorithm
+Rubik.prototype.solve = function() {
+  this.isSolving = true;
 }
 
 // Rotate a face according to Rubik Notation

@@ -74,7 +74,13 @@ function addEventListeners() {
   // TODO: Allow user to select number of moves for shuffle
   $("#button-shuffle").on('click', function(e) {
     e.preventDefault();
-    rubik.shuffle(20);
+    var nMoves = 20 + Math.floor(20 * Math.random());
+    rubik.shuffle(nMoves);
+  });
+
+  $("#button-solve").on('click', function(e) {
+    e.preventDefault();
+    rubik.solve();
   });
 
   $("#button-undo").on('click', function(e) {
@@ -120,6 +126,10 @@ function render() {
 
   if (rubik.isMoving) {
     rubik.rotate();
+  }
+
+  if (rubik.isSolving) {
+    rubik.undo();
   }
 
   // Render the scene
