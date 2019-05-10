@@ -23,7 +23,7 @@ function init() {
 
   // Create a basic perspective camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(2.3, 1.9, 2.3);
+  camera.position.set(1.9, 1.9, 3);
 
   scene.add(camera);
 
@@ -69,6 +69,8 @@ function removeRubiksCube() {
 function addEventListeners() {
   window.addEventListener("resize", onWindowResize, false);
 
+  document.addEventListener("keydown", onKeyDown, false);
+
   // TODO: Allow user to select number of moves for shuffle
   $("#button-shuffle").on('click', function(e) {
     e.preventDefault();
@@ -95,6 +97,10 @@ function addEventListeners() {
     }
   });
 }
+
+function onKeyDown(event) {
+  rubik.rotateFace(event.key);
+};
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;

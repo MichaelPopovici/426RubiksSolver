@@ -63,7 +63,25 @@ function Move(depth, direction, axis) {
   this.axis = axis;
 } 
 
-/***************************** RUBIK *****************************/
+/***************************** RUBIK *****************************
+*
+* NOTATION
+*
+* UPPERCASE = Turn clockwise 90 degree
+* lowercase = Turn counterclockwise 90 degree
+* 
+* F   Front
+* B   Back
+* 
+* L   Left
+* R   Right
+* 
+* U   Up
+* D   Down
+*
+* NOTATION REFERENCE:
+* https://ruwix.com/the-rubiks-cube/notation/
+*/
 function Rubik(dimensions) {
   this.dimensions = dimensions; // number of cubes per row/column
   this.cubes = []; // list of cubes in the Rubik's cube
@@ -165,43 +183,6 @@ Rubik.prototype.executeMoves = function() {
   }
 }
 
-// https://ruwix.com/the-rubiks-cube/notation/
-// Rotate front face in given direction (1: clockwise, -1: counterclockwise)
-Rubik.prototype.rotateF = function(direction) {
-  this.moves.push(new Move(2, -1 * direction, 'z'));
-  this.executeMoves();
-}
-
-// Rotate back face in given direction (1: clockwise, -1: counterclockwise)
-Rubik.prototype.rotateB = function(direction) {
-  this.moves.push(new Move(0, 1 * direction, 'z'));
-  this.executeMoves();
-}
-
-// Rotate left face in given direction (1: clockwise, -1: counterclockwise)
-Rubik.prototype.rotateL = function(direction) {
-  this.moves.push(new Move(0, 1 * direction, 'x'));
-  this.executeMoves();
-}
-
-// Rotate right face in given direction (1: clockwise, -1: counterclockwise)
-Rubik.prototype.rotateR = function(direction) {
-  this.moves.push(new Move(2, -1 * direction, 'x'));
-  this.executeMoves();
-}
-
-// Rotate top face in given direction (1: clockwise, -1: counterclockwise)
-Rubik.prototype.rotateU = function(direction) {
-  this.moves.push(new Move(2, -1 * direction, 'y'));
-  this.executeMoves();
-}
-
-// Rotate bottom face in given direction (1: clockwise, -1: counterclockwise)
-Rubik.prototype.rotateD = function(direction) {
-  this.moves.push(new Move(0, 1 * direction, 'y'));
-  this.executeMoves();
-}
-
 // --------------------------------------------------------
 //                     RUBIK CONTROLS
 // --------------------------------------------------------
@@ -238,4 +219,41 @@ Rubik.prototype.undo = function() {
   } else {
     console.log("Already moving!");
   }
+}
+
+// Rotate a face according to Rubik Notation
+Rubik.prototype.rotateFace = function(face) {
+  if (this.isMoving) {
+    console.log("Already moving!");
+    return;
+  }
+
+  // rotate front face clockwise
+  if (face === 'F') this.moves.push(new Move(2, -1, 'z'));
+  // rotate front face counterclockwise
+  else if (face === 'f') this.moves.push(new Move(2, 1, 'z'));
+  // rotate back face clockwise
+  else if (face === 'B') this.moves.push(new Move(0, 1, 'z'));
+  // rotate back face countclockwise
+  else if (face === 'b') this.moves.push(new Move(0, -1, 'z'));
+
+  // rotate left face clockwise
+  else if (face === 'L') this.moves.push(new Move(0, 1, 'x'));
+  // rotate left face counterclockwise
+  else if (face === 'l') this.moves.push(new Move(0, -1, 'x'));
+  // rotate right face clockwise
+  else if (face === 'R') this.moves.push(new Move(2, -1, 'x'));
+  // rotate right face counterclockwise
+  else if (face === 'r') this.moves.push(new Move(2, 1, 'x'));
+  
+  // rotate top face clockwise
+  else if (face === 'U') this.moves.push(new Move(2, -1, 'y'));
+  // rotate top face counterclockwise
+  else if (face === 'u') this.moves.push(new Move(2, 1, 'y'));
+  // rotate bottom face clockwise
+  else if (face === 'D') this.moves.push(new Move(0, 1, 'y'));
+  // rotate bottom face counterclockwise
+  else if (face === 'd') this.moves.push(new Move(0, -1, 'y'));
+
+  this.executeMoves();
 }
