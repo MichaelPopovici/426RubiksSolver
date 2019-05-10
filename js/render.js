@@ -11,7 +11,8 @@ var cubeMaterial;
 var DIMENSIONS = 3; // default is a 3x3 cube
 var rubik;
 
-var PATTERNS = ["ffBBllRRuuDD", "lRfBuDlR", "ffBBllRRuuDDlRfBuDlR"]; // list of premade patterns
+// list of premade patterns
+var PATTERNS = ["ffBBllRRuuDD", "lRfBuDlR", "ffBBllRRuuDDlRfBuDlR"]; 
 
 init();
 animate();
