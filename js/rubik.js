@@ -189,7 +189,7 @@ Rubik.prototype.executeMoves = function() {
 //                     RUBIK CONTROLS
 // --------------------------------------------------------
 // n: number of moves to simulate during shuffle
-// TODO: Don't undo moves
+// TODO: Random shuffle sometimes undoes moves... Prevent this.
 Rubik.prototype.shuffle = function(n) {
   if (! this.isMoving) {  
     for (let i = 0; i < n; i++) {
@@ -227,39 +227,42 @@ Rubik.prototype.solve = function() {
   this.isSolving = true;
 }
 
-// Rotate a face according to Rubik Notation
-Rubik.prototype.rotateFace = function(face) {
+// Execute a sequence of moves
+// sequence: a string denoting the moves to execute
+Rubik.prototype.move = function(sequence) {
   if (this.isMoving) {
     console.log("Already moving!");
     return;
   }
 
-  // rotate front face clockwise
-  if (face === 'F') this.moves.push(new Move(2, -1, 'z'));
-  // rotate front face counterclockwise
-  else if (face === 'f') this.moves.push(new Move(2, 1, 'z'));
-  // rotate back face clockwise
-  else if (face === 'B') this.moves.push(new Move(0, 1, 'z'));
-  // rotate back face countclockwise
-  else if (face === 'b') this.moves.push(new Move(0, -1, 'z'));
+  for (const move of sequence) {
+    // rotate front face clockwise
+    if (move === 'F') this.moves.push(new Move(2, -1, 'z'));
+    // rotate front face counterclockwise
+    else if (move === 'f') this.moves.push(new Move(2, 1, 'z'));
+    // rotate back face clockwise
+    else if (move === 'B') this.moves.push(new Move(0, 1, 'z'));
+    // rotate back face countclockwise
+    else if (move === 'b') this.moves.push(new Move(0, -1, 'z'));
 
-  // rotate left face clockwise
-  else if (face === 'L') this.moves.push(new Move(0, 1, 'x'));
-  // rotate left face counterclockwise
-  else if (face === 'l') this.moves.push(new Move(0, -1, 'x'));
-  // rotate right face clockwise
-  else if (face === 'R') this.moves.push(new Move(2, -1, 'x'));
-  // rotate right face counterclockwise
-  else if (face === 'r') this.moves.push(new Move(2, 1, 'x'));
-  
-  // rotate top face clockwise
-  else if (face === 'U') this.moves.push(new Move(2, -1, 'y'));
-  // rotate top face counterclockwise
-  else if (face === 'u') this.moves.push(new Move(2, 1, 'y'));
-  // rotate bottom face clockwise
-  else if (face === 'D') this.moves.push(new Move(0, 1, 'y'));
-  // rotate bottom face counterclockwise
-  else if (face === 'd') this.moves.push(new Move(0, -1, 'y'));
+    // rotate left face clockwise
+    else if (move === 'L') this.moves.push(new Move(0, 1, 'x'));
+    // rotate left face counterclockwise
+    else if (move === 'l') this.moves.push(new Move(0, -1, 'x'));
+    // rotate right face clockwise
+    else if (move === 'R') this.moves.push(new Move(2, -1, 'x'));
+    // rotate right face counterclockwise
+    else if (move === 'r') this.moves.push(new Move(2, 1, 'x'));
+    
+    // rotate top face clockwise
+    else if (move === 'U') this.moves.push(new Move(2, -1, 'y'));
+    // rotate top face counterclockwise
+    else if (move === 'u') this.moves.push(new Move(2, 1, 'y'));
+    // rotate bottom face clockwise
+    else if (move === 'D') this.moves.push(new Move(0, 1, 'y'));
+    // rotate bottom face counterclockwise
+    else if (move === 'd') this.moves.push(new Move(0, -1, 'y'));
+  }
 
   this.executeMoves();
 }

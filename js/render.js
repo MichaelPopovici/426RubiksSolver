@@ -11,6 +11,8 @@ var cubeMaterial;
 var DIMENSIONS = 3; // default is a 3x3 cube
 var rubik;
 
+var PATTERNS = ["ffBBllRRuuDD", "lRfBuDlR", "ffBBllRRuuDDlRfBuDlR"]; // list of premade patterns
+
 init();
 animate();
 
@@ -93,6 +95,7 @@ function addEventListeners() {
     if (! rubik.isMoving) {    
       removeRubiksCube();
       addRubiksCube($("#select-size").val());
+      $("#select-pattern").val(-1);
     }
   });
 
@@ -100,12 +103,32 @@ function addEventListeners() {
     if (! rubik.isMoving) {    
       removeRubiksCube();
       addRubiksCube($(this).val());
+      $("#select-pattern").val(-1);
+
+      // hide patterns for cubes bigger than 3x3
+      if ($(this).val() !== "3") {
+        $("#pattern-li").hide()
+      } else {
+        $("#pattern-li").show()
+      }
+    }
+  });
+
+  $("#select-pattern").on('change', function() { 
+    if (! rubik.isMoving) {
+      var patternIndex = $(this).val();
+      if (patternIndex !== -1) {
+        rubik.move(PATTERNS[patternIndex]);
+      }
     }
   });
 }
 
 function onKeyDown(event) {
-  rubik.rotateFace(event.key);
+  var key = event.key;
+  if (key.length === 1) {
+    rubik.move(event.key);
+  }
 };
 
 function onWindowResize() {
