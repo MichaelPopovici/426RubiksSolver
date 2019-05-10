@@ -61,6 +61,11 @@ function addEventListeners() {
     e.preventDefault();
     rubik.shuffle(20);
   });
+
+  $("#button-undo").on('click', function(e) {
+    e.preventDefault();
+    rubik.undo();
+  });
 }
 
 function onWindowResize() {

@@ -63,8 +63,10 @@ function Rubik(dimensions) {
   this.cubes = []; // list of cubes in the Rubik's cube
   this.moves = []; // queue of moves to execute
   this.currentMove = {}; // current move to execute
-  this.activeCubes = []; // list of cubes to be moved
+  this.activeCubes = []; // list of cubes to be rotated
   this.isMoving = false; // is a move being executed?
+  this.completedMoves = []; // stack of completed moves
+  this.isUndoing = false; // are we undoing a move?
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (dimensions - 1) * len * 0.5;  
@@ -142,6 +144,8 @@ Rubik.prototype.moveComplete = function() {
 
   // reset variables
   this.isMoving = false;
+  if (! this.isUndoing) this.completedMoves.push(this.currentMove);
+  this.isUndoing = false;
   this.currentMove = {};
   this.activeCubes = [];
   
@@ -172,6 +176,23 @@ Rubik.prototype.shuffle = function(n) {
     }
 
     this.executeMoves();
+  } else {
+    console.log("Already moving!");
+  }
+}
+
+Rubik.prototype.undo = function() {
+  if (! this.isMoving) {
+    var prevMove = this.completedMoves.pop();
+    if (prevMove) {
+      prevMove.direction *= -1;
+      this.moves.push(prevMove);
+      
+      this.isUndoing = true;
+      this.executeMoves();      
+    } else {
+      console.log("Cube is reset!");
+    }
   } else {
     console.log("Already moving!");
   }
