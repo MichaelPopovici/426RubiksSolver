@@ -25,6 +25,12 @@ function createCube(x, y, z) {
   cube = new THREE.Mesh(cubeGeometry, faceMaterials);
   cube.castShadow = true;
 
+  // add black edges to each cube
+  var edgeGeometry = new THREE.EdgesGeometry(cube.geometry);
+  var edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+  var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+  cube.add(edges); // add edge as a child of the parent mesh
+
   cube.position.set(x, y, z);
 
   return cube;
@@ -160,9 +166,10 @@ Rubik.prototype.executeMoves = function() {
 }
 
 // --------------------------------------------------------
-//                        RUBIK CONTROLS
+//                     RUBIK CONTROLS
 // --------------------------------------------------------
 // n: number of moves to simulate during shuffle
+// TODO: Don't undo moves
 Rubik.prototype.shuffle = function(n) {
   if (! this.isMoving) {  
     for (let i = 0; i < n; i++) {
@@ -170,9 +177,7 @@ Rubik.prototype.shuffle = function(n) {
       var direction = randomDirection();
       var axis = randomAxis();
 
-      var move = new Move(depth, direction, axis);
-
-      this.moves.push(move);
+      this.moves.push(new Move(depth, direction, axis));
     }
 
     this.executeMoves();
