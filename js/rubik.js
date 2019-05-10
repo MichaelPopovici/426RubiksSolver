@@ -6,7 +6,7 @@ var CUBE_SIZE = 0.5; // length of each cube side
 var SPACE_BETWEEN_CUBES = CUBE_SIZE / 100; // spacing between each cube
 
 // TODO: Allow user to choose rotation speed
-var ROTATION_SPEED = 0.2; // speed of cube rotation
+var ROTATION_SPEED = 0.15; // speed of cube rotation
 
 // https://stackoverflow.com/questions/20089098/three-js-adding-and-removing-children-of-rotated-objects
 var pivot = new THREE.Object3D();

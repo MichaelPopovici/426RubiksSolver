@@ -50,8 +50,9 @@ function init() {
   addEventListeners();
 }
 
-function addRubiksCube() {
-  rubik = new Rubik(DIMENSIONS);
+function addRubiksCube(size) {
+  size = size || DIMENSIONS;
+  rubik = new Rubik(size);
   let cubes = rubik.cubes;
   for (let i = 0; i < cubes.length; i++) {
     scene.add(cubes[i]);
@@ -83,7 +84,14 @@ function addEventListeners() {
     e.preventDefault();
     if (! rubik.isMoving) {    
       removeRubiksCube();
-      addRubiksCube();
+      addRubiksCube($("#select-size").val());
+    }
+  });
+
+  $("#select-size").on('change', function() { 
+    if (! rubik.isMoving) {    
+      removeRubiksCube();
+      addRubiksCube($(this).val());
     }
   });
 }
