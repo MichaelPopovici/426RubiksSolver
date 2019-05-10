@@ -5,6 +5,9 @@ var COLORS = [0xFF5900, 0xB90000, 0x0045AD, 0x009B48, 0xFFD500, 0xFFFFFF];
 var CUBE_SIZE = 0.5; // length of each cube side
 var SPACE_BETWEEN_CUBES = CUBE_SIZE / 100; // spacing between each cube
 
+// TODO: Allow user to choose rotation speed
+var ROTATION_SPEED = 0.2; // speed of cube rotation
+
 // https://stackoverflow.com/questions/20089098/three-js-adding-and-removing-children-of-rotated-objects
 var pivot = new THREE.Object3D();
 
@@ -27,18 +30,6 @@ function createCube(x, y, z) {
   return cube;
 }
 
-// return a list of cubes on the face described by axis and face.
-// (aka return the cubes we want to rotate)
-function getActiveCubes(cubes, axis, face) {
-  var activeCubes = [];
-  cubes.forEach(function(cube) {
-    if (equal(cube.position[axis], face)) {
-      activeCubes.push(cube);
-    }
-  });
-  return activeCubes;
-}
-
 function equal(a, b) {
   return Math.abs(a - b) <= EPS;
 }
@@ -55,15 +46,28 @@ function randomDirection() {
   return randomInt(0, 1) * 2 - 1;
 }
 
+/***************************** MOVE *****************************/
+// A Move describes a face rotation. 
+// depth: the depth of the face to be rotated (0 to dimensions - 1)
+// direction: the direction in which to rotate the face (-1 or 1)
+// axis: The axis (x, y, z) perpendicular to the face
+function Move(depth, direction, axis) {
+  this.depth = depth;
+  this.direction = direction;
+  this.axis = axis;
+} 
+
 /***************************** RUBIK *****************************/
 function Rubik(dimensions) {
-  this.dimensions = dimensions;
-  this.cubes = [];
+  this.dimensions = dimensions; // number of cubes per row/column
+  this.cubes = []; // list of cubes in the Rubik's cube
+  this.moves = []; // queue of moves to execute
+  this.currentMove = {}; // current move to execute
+  this.activeCubes = []; // list of cubes to be moved
+  this.isMoving = false; // is a move being executed?
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (dimensions - 1) * len * 0.5;  
-  this.center = (len * (dimensions - 1) - 2 * offset) / 2;
-
   for (let i = 0; i < dimensions; i++) {
     for (let j = 0; j < dimensions; j++) {
       for (let k = 0; k < dimensions; k++) {
@@ -76,35 +80,78 @@ function Rubik(dimensions) {
   }
 }
 
-// Rotate a face at depth (0 to dimensions - 1) perpendicular to
-// axis (x, y, z) in a direction (-1 or 1).
-Rubik.prototype.rotate = function(depth, direction, axis) {
+Rubik.prototype.setActiveCubes = function() {
+  var depth = this.currentMove.depth;
+  var direction = this.currentMove.direction;
+  var axis = this.currentMove.axis;
+
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (this.dimensions - 1) * len * 0.5;
   var face = len * depth - offset;
 
-  var activeCubes = getActiveCubes(this.cubes, axis, face);
+  for (let i = 0; i < this.cubes.length; i++) {
+    var cube = this.cubes[i];
+    if (equal(cube.position[axis], face)) {
+      this.activeCubes.push(cube);
+    }
+  }
+}
+
+Rubik.prototype.executeCurrentMove = function() {
+  this.isMoving = true;
+
+  this.setActiveCubes();
 
   pivot.rotation.set(0, 0, 0);
   pivot.updateMatrixWorld();
   scene.add(pivot);
 
   // make the cubes a child of the pivot
-  for (let i = 0; i < activeCubes.length; i++) {
-    THREE.SceneUtils.attach(activeCubes[i], scene, pivot)
+  for (let i = 0; i < this.activeCubes.length; i++) {
+    THREE.SceneUtils.attach(this.activeCubes[i], scene, pivot)
   }
+}
 
-  // rotate
-  pivot.rotation[axis] += direction * Math.PI / 2;
+// Rotate a face a quarter turn and then stop
+Rubik.prototype.rotate = function() {
+  var direction = this.currentMove.direction;
+  var axis = this.currentMove.axis;
 
+  // Account for over-rotation and stop
+  if (pivot.rotation[axis] >= Math.PI / 2) {
+    pivot.rotation[axis] = Math.PI / 2;
+    this.moveComplete();
+  } else if (pivot.rotation[axis] <= -Math.PI / 2) {
+    pivot.rotation[axis] = -Math.PI / 2;
+    this.moveComplete();
+  } else {
+    // otherwise continue rotating
+    pivot.rotation[axis] += direction * ROTATION_SPEED;
+  }
+}
+
+Rubik.prototype.moveComplete = function() {
   // put the cubes back as children of the scene
   pivot.updateMatrixWorld();
   scene.remove(pivot);
-  for (let i = 0; i < activeCubes.length; i++) {
-    var cube = activeCubes[i];
+  for (let i = 0; i < this.activeCubes.length; i++) {
+    var cube = this.activeCubes[i];
     cube.updateMatrixWorld();
-
     THREE.SceneUtils.detach(cube, pivot, scene);
+  }
+
+  // reset variables
+  this.isMoving = false;
+  this.currentMove = {};
+  this.activeCubes = [];
+  
+  this.executeMoves(); // execute the next move
+}
+
+Rubik.prototype.executeMoves = function() {
+  if (this.moves.length > 0) {
+    this.currentMove = this.moves.shift();
+    this.executeCurrentMove();
   }
 }
 
@@ -115,6 +162,10 @@ Rubik.prototype.shuffle = function(n) {
     var direction = randomDirection();
     var axis = randomAxis();
 
-    this.rotate(depth, direction, axis);
+    var move = new Move(depth, direction, axis);
+
+    this.moves.push(move);
   }
+
+  this.executeMoves();
 }

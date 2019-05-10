@@ -3,7 +3,6 @@ if (!Detector.webgl) Detector.addGetWebGLMessage();
 var container;
 var controls;
 var camera, scene, renderer;
-var time;
 
 var cubeObject;
 var cubeGeometry;
@@ -73,16 +72,16 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
 
-  time = Date.now();
-
   render();
   controls.update();
 }
 
 function render() {
-  let timer = Date.now() * 0.0002;
-
   camera.lookAt(scene.position);
+
+  if (rubik.isMoving) {
+    rubik.rotate();
+  }
 
   // Render the scene
   renderer.render(scene, camera);
