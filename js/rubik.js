@@ -13,15 +13,96 @@ var pivot = new THREE.Object3D();
 
 var EPS = 0.01;
 
+var GRADIENT = true;
+
 /****************************** HELPER FUNCTIONS ******************************/
 function createCube(x, y, z) {
   /* TODO: color the inside faces of each cube black
    * (Maybe color all faces black to begin with, then "whitelist" exterior faces)
    */
+
   var faceMaterials = COLORS.map(function(c) {
+    if (GRADIENT == true) {
+      var color_1;
+      var color_2;
+        if (y < 0) {
+          color_1 = new THREE.Color(c);
+          color_2 = new THREE.Color(c);
+          color_2 = color_2.addScalar(1 / 3);
+        } else if (y == 0) {
+          color_1 = new THREE.Color(c);
+          color_1 = color_1.addScalar(1 / 3);
+          color_2 = new THREE.Color(c);
+          color_2 = color_2.addScalar(2 / 3);
+        } else {
+          color_1 = new THREE.Color(c);
+          color_1 = color_1.addScalar(2 / 3);
+          color_2 = new THREE.Color(c);
+          color_2 = color_2.addScalar(1);
+        }
+  /*
+    } else if (x == 0) {
+     if (y < 0) {
+        color_1 = new THREE.Color("black");
+        color_2 = new THREE.Color("white");
+      } else if (y == 0) {
+        color_1 = new THREE.Color("white");
+        color_2 = new THREE.Color("black");
+      } else {
+        color_1 = new THREE.Color("black");
+        color_2 = new THREE.Color("white");
+      }
+    } else {
+      if (y < 0) {
+        color_1 = new THREE.Color("red");
+        color_2 = new THREE.Color("yellow");
+      } else if (y == 0) {
+        color_1 = new THREE.Color("yellow");
+        color_2 = new THREE.Color("red");
+      } else {
+        color_1 = new THREE.Color("red");
+        color_2 = new THREE.Color("yellow");
+      }
+    } */
+    return new THREE.ShaderMaterial({
+  uniforms: {
+    color1: {
+      value: color_1
+    },
+    color2: {
+      value: color_2
+    }
+  },
+  vertexShader: `
+    varying vec2 vUv;
+
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 color1;
+    uniform vec3 color2;
+  
+    varying vec2 vUv;
+    
+    void main() {
+      
+      gl_FragColor = vec4(mix(color1, color2, vUv.y), 1.0);
+    }
+  `,
+  wireframe: false
+});
+  }else {
     return new THREE.MeshLambertMaterial({ color: c });
+  }
   });
   var cubeGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+  for (var i = 0; i < 3; i++) {
+    cubeGeometry.faces[ i ].color.setHex( 0xffffff );
+  }
+  cubeGeometry.colorsNeedUpdate = true;
   cube = new THREE.Mesh(cubeGeometry, faceMaterials);
   cube.castShadow = true;
 
