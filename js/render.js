@@ -123,6 +123,19 @@ function addEventListeners() {
       }
     }
   });
+  $("#select-background").on('change', function() { 
+      var backgroundIndex = $(this).val();
+      if (patternIndex == -1) {
+        renderer.setClearColor(0xcce0ff);
+      }
+      if (patternIndex == 0) {}
+      if (patternIndex == 1) {}
+      if (patternIndex == 2) {}
+      if (patternIndex == 3) {}
+      if (patternIndex == 4) {}
+      if (patternIndex == 5) {}
+      if (patternIndex == 6) {}
+  });
 }
 
 function onKeyDown(event) {
