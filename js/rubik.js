@@ -1,6 +1,6 @@
 /****************************** RUBIK PROPERTIES ******************************/
 // Rubiks cube face colors (Orange, Red, Blue, Green, Yellow, White)
-var COLORS = [0xFF5900, 0xB90000, 0x0045AD, 0x009B48, 0xFFD500, 0xFFFFFF];
+var COLORS = [0xFF5900, 0xB90000, 0x0045AD, 0x009B48, 0xFFD500, 0xEEEEEE];
 
 var CUBE_SIZE = 0.5; // length of each cube side
 var SPACE_BETWEEN_CUBES = CUBE_SIZE / 100; // spacing between each cube
@@ -71,9 +71,16 @@ function Rubik(dimensions, texture) {
   this.isUndoing = false; // are we undoing a move?
   this.isSolving = false; // are we solving the Rubik's cube?
   this.texture = parseInt(texture); // texture of the stickers
+  this.coordinates = []; // list of possible values that x, y, z components can take
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
-  var offset = (dimensions - 1) * len * 0.5;  
+  var offset = (dimensions - 1) * len * 0.5;
+  // set this.coordinates
+  for (let i = 0; i < dimensions; i++) {
+    this.coordinates.push(len * i - offset);
+  }
+  
+  // create cubes
   for (let i = 0; i < dimensions; i++) {
     for (let j = 0; j < dimensions; j++) {
       for (let k = 0; k < dimensions; k++) {
@@ -93,27 +100,30 @@ Rubik.prototype.createCube = function(x, y, z) {
   }
   cubeGeometry.colorsNeedUpdate = true;
 
-  var texture = this.texture;
-  var faceMaterials = COLORS.map(function(c) {
-    if (texture === 0) {
+
+  var faceMaterials = [];
+  // Default texture
+  if (this.texture === -1) {  
+    faceMaterials = COLORS.map(function(c) {
+      return new THREE.MeshLambertMaterial({ color: c });
+    });
+  }
+  // Gradient texture
+  else if (this.texture === 0) {
+    for (let i = 0; i < COLORS.length; i++) {
+      var c = COLORS[i];
+
       var color_1;
       var color_2;
-      if (y < 0) {
-        color_1 = new THREE.Color(c);
-        color_2 = new THREE.Color(c);
-        color_2 = color_2.addScalar(1 / 3);
-      } else if (y == 0) {
-        color_1 = new THREE.Color(c);
-        color_1 = color_1.addScalar(1 / 3);
-        color_2 = new THREE.Color(c);
-        color_2 = color_2.addScalar(2 / 3);
-      } else {
-        color_1 = new THREE.Color(c);
-        color_1 = color_1.addScalar(2 / 3);
-        color_2 = new THREE.Color(c);
-        color_2 = color_2.addScalar(1);
+      for (let j = 0; j < this.dimensions; j++) {
+        if (equal(y, this.coordinates[j])) {
+          color_1 = new THREE.Color(c).addScalar(j / this.dimensions);
+          color_2 = new THREE.Color(c).addScalar((j + 1) / this.dimensions);
+        }
       }
-      return new THREE.ShaderMaterial({
+
+      // https://discourse.threejs.org/t/rendering-a-gradient-material-using-threejs-and-glsl/602/3
+      var material = new THREE.ShaderMaterial({
         uniforms: {
           color1: {
             value: color_1
@@ -143,12 +153,12 @@ Rubik.prototype.createCube = function(x, y, z) {
         `,
         wireframe: false
       });
-    } else if (texture === -1) {
-      return new THREE.MeshLambertMaterial({ color: c });
-    }
-  });
 
-  if (texture === 1) {
+      faceMaterials.push(material);
+    }
+  }
+  // Floral texture
+  else if (this.texture === 1) {
     const loader = new THREE.TextureLoader();
     faceMaterials = [
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-1.png')}),
@@ -158,6 +168,10 @@ Rubik.prototype.createCube = function(x, y, z) {
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-5.png')}),
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-6.png')}),
     ];
+  }
+  // Perlin texture
+  else if (this.texture === 2) {
+
   }
   cube = new THREE.Mesh(cubeGeometry, faceMaterials);
   cube.castShadow = true;
