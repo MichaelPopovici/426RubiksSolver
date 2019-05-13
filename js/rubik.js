@@ -13,7 +13,8 @@ var pivot = new THREE.Object3D();
 
 var EPS = 0.01;
 
-var GRADIENT = true;
+var GRADIENT = false;
+var DFACES = true;
 
 /****************************** HELPER FUNCTIONS ******************************/
 function createCube(x, y, z) {
@@ -22,6 +23,7 @@ function createCube(x, y, z) {
    */
 
   var faceMaterials = COLORS.map(function(c) {
+    // adapted from: https://stackoverflow.com/questions/52614371/apply-color-gradient-to-material-on-mesh-three-js
     if (GRADIENT == true) {
       var color_1;
       var color_2;
@@ -94,7 +96,8 @@ function createCube(x, y, z) {
   `,
   wireframe: false
 });
-  }else {
+  }
+  else {
     return new THREE.MeshLambertMaterial({ color: c });
   }
   });
@@ -103,7 +106,21 @@ function createCube(x, y, z) {
     cubeGeometry.faces[ i ].color.setHex( 0xffffff );
   }
   cubeGeometry.colorsNeedUpdate = true;
-  cube = new THREE.Mesh(cubeGeometry, faceMaterials);
+  if (DFACES == true) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-1.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-2.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-3.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-4.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-5.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-6.png')}),
+    ];
+    cube = new THREE.Mesh(cubeGeometry, materials);
+  }
+  else {
+    cube = new THREE.Mesh(cubeGeometry, faceMaterials);
+  }
   cube.castShadow = true;
 
   // add black edges to each cube
