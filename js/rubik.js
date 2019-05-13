@@ -13,127 +13,7 @@ var pivot = new THREE.Object3D();
 
 var EPS = 0.01;
 
-var GRADIENT = false;
-var DFACES = true;
-
 /****************************** HELPER FUNCTIONS ******************************/
-function createCube(x, y, z) {
-  /* TODO: color the inside faces of each cube black
-   * (Maybe color all faces black to begin with, then "whitelist" exterior faces)
-   */
-
-  var faceMaterials = COLORS.map(function(c) {
-    // adapted from: https://stackoverflow.com/questions/52614371/apply-color-gradient-to-material-on-mesh-three-js
-    if (GRADIENT == true) {
-      var color_1;
-      var color_2;
-        if (y < 0) {
-          color_1 = new THREE.Color(c);
-          color_2 = new THREE.Color(c);
-          color_2 = color_2.addScalar(1 / 3);
-        } else if (y == 0) {
-          color_1 = new THREE.Color(c);
-          color_1 = color_1.addScalar(1 / 3);
-          color_2 = new THREE.Color(c);
-          color_2 = color_2.addScalar(2 / 3);
-        } else {
-          color_1 = new THREE.Color(c);
-          color_1 = color_1.addScalar(2 / 3);
-          color_2 = new THREE.Color(c);
-          color_2 = color_2.addScalar(1);
-        }
-  /*
-    } else if (x == 0) {
-     if (y < 0) {
-        color_1 = new THREE.Color("black");
-        color_2 = new THREE.Color("white");
-      } else if (y == 0) {
-        color_1 = new THREE.Color("white");
-        color_2 = new THREE.Color("black");
-      } else {
-        color_1 = new THREE.Color("black");
-        color_2 = new THREE.Color("white");
-      }
-    } else {
-      if (y < 0) {
-        color_1 = new THREE.Color("red");
-        color_2 = new THREE.Color("yellow");
-      } else if (y == 0) {
-        color_1 = new THREE.Color("yellow");
-        color_2 = new THREE.Color("red");
-      } else {
-        color_1 = new THREE.Color("red");
-        color_2 = new THREE.Color("yellow");
-      }
-    } */
-    return new THREE.ShaderMaterial({
-  uniforms: {
-    color1: {
-      value: color_1
-    },
-    color2: {
-      value: color_2
-    }
-  },
-  vertexShader: `
-    varying vec2 vUv;
-
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
-    }
-  `,
-  fragmentShader: `
-    uniform vec3 color1;
-    uniform vec3 color2;
-  
-    varying vec2 vUv;
-    
-    void main() {
-      
-      gl_FragColor = vec4(mix(color1, color2, vUv.y), 1.0);
-    }
-  `,
-  wireframe: false
-});
-  }
-  else {
-    return new THREE.MeshLambertMaterial({ color: c });
-  }
-  });
-  var cubeGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
-  for (var i = 0; i < 3; i++) {
-    cubeGeometry.faces[ i ].color.setHex( 0xffffff );
-  }
-  cubeGeometry.colorsNeedUpdate = true;
-  if (DFACES == true) {
-    const loader = new THREE.TextureLoader();
-    const materials = [
-      new THREE.MeshBasicMaterial({map: loader.load('images/flower-1.png')}),
-      new THREE.MeshBasicMaterial({map: loader.load('images/flower-2.png')}),
-      new THREE.MeshBasicMaterial({map: loader.load('images/flower-3.png')}),
-      new THREE.MeshBasicMaterial({map: loader.load('images/flower-4.png')}),
-      new THREE.MeshBasicMaterial({map: loader.load('images/flower-5.png')}),
-      new THREE.MeshBasicMaterial({map: loader.load('images/flower-6.png')}),
-    ];
-    cube = new THREE.Mesh(cubeGeometry, materials);
-  }
-  else {
-    cube = new THREE.Mesh(cubeGeometry, faceMaterials);
-  }
-  cube.castShadow = true;
-
-  // add black edges to each cube
-  var edgeGeometry = new THREE.EdgesGeometry(cube.geometry);
-  var edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
-  var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
-  cube.add(edges); // add edge as a child of the parent mesh
-
-  cube.position.set(x, y, z);
-
-  return cube;
-}
-
 function equal(a, b) {
   return Math.abs(a - b) <= EPS;
 }
@@ -180,7 +60,7 @@ function Move(depth, direction, axis) {
 * NOTATION REFERENCE:
 * https://ruwix.com/the-rubiks-cube/notation/
 */
-function Rubik(dimensions) {
+function Rubik(dimensions, texture) {
   this.dimensions = dimensions; // number of cubes per row/column
   this.cubes = []; // list of cubes in the Rubik's cube
   this.moves = []; // queue of moves to execute
@@ -190,6 +70,7 @@ function Rubik(dimensions) {
   this.completedMoves = []; // stack of completed moves
   this.isUndoing = false; // are we undoing a move?
   this.isSolving = false; // are we solving the Rubik's cube?
+  this.texture = parseInt(texture); // texture of the stickers
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (dimensions - 1) * len * 0.5;  
@@ -199,10 +80,98 @@ function Rubik(dimensions) {
         var x = len * i - offset;
         var y = len * j - offset;
         var z = len * k - offset;
-        this.cubes.push(createCube(x, y, z));
+        this.createCube(x, y, z);
       }
     }
   }
+}
+
+Rubik.prototype.createCube = function(x, y, z) {
+  var texture = this.texture;
+  var faceMaterials = COLORS.map(function(c) {
+    if (texture === 0) {
+      var color_1;
+      var color_2;
+      if (y < 0) {
+        color_1 = new THREE.Color(c);
+        color_2 = new THREE.Color(c);
+        color_2 = color_2.addScalar(1 / 3);
+      } else if (y == 0) {
+        color_1 = new THREE.Color(c);
+        color_1 = color_1.addScalar(1 / 3);
+        color_2 = new THREE.Color(c);
+        color_2 = color_2.addScalar(2 / 3);
+      } else {
+        color_1 = new THREE.Color(c);
+        color_1 = color_1.addScalar(2 / 3);
+        color_2 = new THREE.Color(c);
+        color_2 = color_2.addScalar(1);
+      }
+      return new THREE.ShaderMaterial({
+        uniforms: {
+          color1: {
+            value: color_1
+          },
+          color2: {
+            value: color_2
+          }
+        },
+        vertexShader: `
+          varying vec2 vUv;
+
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 color1;
+          uniform vec3 color2;
+        
+          varying vec2 vUv;
+          
+          void main() {
+            
+            gl_FragColor = vec4(mix(color1, color2, vUv.y), 1.0);
+          }
+        `,
+        wireframe: false
+      });
+    } else if (texture === -1) {
+      return new THREE.MeshLambertMaterial({ color: c });
+    }
+  });
+
+  var cubeGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+  for (var i = 0; i < 3; i++) {
+    cubeGeometry.faces[ i ].color.setHex( 0xffffff );
+  }
+  cubeGeometry.colorsNeedUpdate = true;
+  if (texture === 1) {
+    const loader = new THREE.TextureLoader();
+    const materials = [
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-1.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-2.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-3.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-4.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-5.png')}),
+      new THREE.MeshBasicMaterial({map: loader.load('images/flower-6.png')}),
+    ];
+    cube = new THREE.Mesh(cubeGeometry, materials);
+  } else {
+    cube = new THREE.Mesh(cubeGeometry, faceMaterials);
+  }
+  cube.castShadow = true;
+
+  // add black edges to each cube
+  var edgeGeometry = new THREE.EdgesGeometry(cube.geometry);
+  var edgeMaterial = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
+  var edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+  cube.add(edges); // add edge as a child of the parent mesh
+
+  cube.position.set(x, y, z);
+
+  this.cubes.push(cube);
 }
 
 Rubik.prototype.setActiveCubes = function() {

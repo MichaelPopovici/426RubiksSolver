@@ -53,9 +53,10 @@ function init() {
   addEventListeners();
 }
 
-function addRubiksCube(size) {
+function addRubiksCube(size, texture) {
   size = size || DIMENSIONS;
-  rubik = new Rubik(size);
+  texture = texture || -1;
+  rubik = new Rubik(size, texture);
   let cubes = rubik.cubes;
   for (let i = 0; i < cubes.length; i++) {
     scene.add(cubes[i]);
@@ -97,13 +98,14 @@ function addEventListeners() {
       removeRubiksCube();
       addRubiksCube($("#select-size").val());
       $("#select-pattern").val(-1);
+      $("#select-texture").val(-1);
     }
   });
 
   $("#select-size").on('change', function() { 
     if (! rubik.isMoving) {    
       removeRubiksCube();
-      addRubiksCube($(this).val());
+      addRubiksCube($(this).val(), $("#select-texture").val());
       $("#select-pattern").val(-1);
 
       // hide patterns for cubes bigger than 3x3
@@ -123,10 +125,10 @@ function addEventListeners() {
       }
     }
   });
+
   $("#select-background").on('change', function() { 
       var backgroundIndex = $(this).val();
       var loader = new THREE.TextureLoader();
-      console.log("Change");
       if (backgroundIndex == -1) {
         scene.background = {};
       }
@@ -166,6 +168,14 @@ function addEventListeners() {
           scene.background = texture;
         });
       }
+  });
+
+  $("#select-texture").on('change', function() { 
+    if (! rubik.isMoving) {
+      removeRubiksCube();
+      addRubiksCube($("#select-size").val(), $(this).val());
+      $("#select-pattern").val(-1);
+    }
   });
 }
 
