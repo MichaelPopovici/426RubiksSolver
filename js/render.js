@@ -125,10 +125,15 @@ function addEventListeners() {
   });
   $("#select-background").on('change', function() { 
       var backgroundIndex = $(this).val();
+      var loader = new THREE.TextureLoader();
       if (patternIndex == -1) {
         renderer.setClearColor(0xcce0ff);
       }
-      if (patternIndex == 0) {}
+      if (patternIndex == 0) {
+        loader.load('images/finkel.jpg' , function(texture) {
+          scene.background = texture;
+        });
+      }
       if (patternIndex == 1) {}
       if (patternIndex == 2) {}
       if (patternIndex == 3) {}
