@@ -126,20 +126,46 @@ function addEventListeners() {
   $("#select-background").on('change', function() { 
       var backgroundIndex = $(this).val();
       var loader = new THREE.TextureLoader();
-      if (patternIndex == -1) {
-        renderer.setClearColor(0xcce0ff);
+      console.log("Change");
+      if (backgroundIndex == -1) {
+        scene.background = {};
       }
-      if (patternIndex == 0) {
-        loader.load('images/finkel.jpg' , function(texture) {
+      if (backgroundIndex == 0) {
+        loader.load('images/cos426.png' , function(texture) {
+          texture.flipY = false;
           scene.background = texture;
         });
       }
-      if (patternIndex == 1) {}
-      if (patternIndex == 2) {}
-      if (patternIndex == 3) {}
-      if (patternIndex == 4) {}
-      if (patternIndex == 5) {}
-      if (patternIndex == 6) {}
+      if (backgroundIndex == 1) {
+        loader.load('images/flower.png' , function(texture) {
+          scene.background = texture;
+        });
+      }
+      if (backgroundIndex == 2) {
+        loader.load('images/grid.png' , function(texture) {
+          scene.background = texture;
+        });
+      }
+      if (backgroundIndex == 3) {
+        loader.load('images/rayTracer.png' , function(texture) {
+          scene.background = texture;
+        });
+      }
+      if (backgroundIndex == 4) {
+        loader.load('images/wireKettle.png' , function(texture) {
+          scene.background = texture;
+        });
+      }
+      if (backgroundIndex == 5) {
+        loader.load('images/cloth.png' , function(texture) {
+          scene.background = texture;
+        });
+      }
+      if (backgroundIndex == 6) {
+        loader.load('images/finkel.png' , function(texture) {
+          scene.background = texture;
+        });
+      }
   });
 }
 
