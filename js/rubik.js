@@ -87,6 +87,12 @@ function Rubik(dimensions, texture) {
 }
 
 Rubik.prototype.createCube = function(x, y, z) {
+  var cubeGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
+  for (var i = 0; i < 3; i++) {
+    cubeGeometry.faces[ i ].color.setHex( 0xffffff );
+  }
+  cubeGeometry.colorsNeedUpdate = true;
+
   var texture = this.texture;
   var faceMaterials = COLORS.map(function(c) {
     if (texture === 0) {
@@ -142,14 +148,9 @@ Rubik.prototype.createCube = function(x, y, z) {
     }
   });
 
-  var cubeGeometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, CUBE_SIZE);
-  for (var i = 0; i < 3; i++) {
-    cubeGeometry.faces[ i ].color.setHex( 0xffffff );
-  }
-  cubeGeometry.colorsNeedUpdate = true;
   if (texture === 1) {
     const loader = new THREE.TextureLoader();
-    const materials = [
+    faceMaterials = [
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-1.png')}),
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-2.png')}),
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-3.png')}),
@@ -157,10 +158,8 @@ Rubik.prototype.createCube = function(x, y, z) {
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-5.png')}),
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-6.png')}),
     ];
-    cube = new THREE.Mesh(cubeGeometry, materials);
-  } else {
-    cube = new THREE.Mesh(cubeGeometry, faceMaterials);
   }
+  cube = new THREE.Mesh(cubeGeometry, faceMaterials);
   cube.castShadow = true;
 
   // add black edges to each cube
