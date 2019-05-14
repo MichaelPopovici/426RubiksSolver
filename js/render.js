@@ -14,6 +14,39 @@ var rubik;
 // list of premade patterns
 var PATTERNS = ["ffBBllRRuuDD", "lRfBuDlR", "ffBBllRRuuDDlRfBuDlR"]; 
 
+var pointLights = [
+  {
+    light: new THREE.PointLight(0xffffff, 1),
+    pos: new THREE.Vector3(1.9, 1.9, 3)
+  },
+  {
+    light: new THREE.PointLight(0xffffff, 1),
+    pos: new THREE.Vector3(-1.9, -1.9, -3)
+  },
+  {
+    light: new THREE.PointLight(0xffffff, 1),
+    pos: new THREE.Vector3(-1.9, 1.9, 3)
+  },
+  {
+    light: new THREE.PointLight(0xffffff, 1),
+    pos: new THREE.Vector3(1.9, -1.9, 3)
+  },
+  {
+    light: new THREE.PointLight(0xffffff, 1),
+    pos: new THREE.Vector3(1.9, 1.9, -3)
+  }
+];
+
+var ambientLights = [
+  new THREE.AmbientLight(0xffffff), 
+  new THREE.AmbientLight(0xffffff),
+  new THREE.AmbientLight(0xffffff),
+  new THREE.AmbientLight(0xffffff),
+  new THREE.AmbientLight(0xffffff)
+];
+
+var isAmbientLight; // are we using ambient light as the illumination model?
+
 init();
 animate();
 
@@ -33,7 +66,7 @@ function init() {
   // Create a renderer with Antialiasing
   renderer = new THREE.WebGLRenderer({ antialias: true, devicePixelRatio: 1 });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0xcce0ff);
+  // renderer.setClearColor(0xcce0ff);
 
   container.appendChild(renderer.domElement);
   renderer.gammaInput = true;
@@ -44,13 +77,39 @@ function init() {
   controls = new THREE.TrackballControls(camera, renderer.domElement);
 
   // lights
-  scene.add(new THREE.AmbientLight(0xffffff));
+  isAmbientLight = true;
+  addAmbientLights(1);
 
   // Add Rubik's cube
   addRubiksCube();
 
   // event listeners
   addEventListeners();
+}
+
+function removeAllLights() {
+  var n = Math.max(pointLights.length, ambientLights.length);
+  for (let i = 0; i < n; i++) {
+    scene.remove(ambientLights[i]);
+    scene.remove(pointLights[i].light);
+  }
+}
+
+function addPointLights(n) {
+  for (let i = 0; i < n; i++) {
+    var light = pointLights[i].light;
+    var pos = pointLights[i].pos;
+    light.position.set(pos.x, pos.y, pos.z);
+    scene.add(light);
+
+    // scene.add(new THREE.PointLightHelper(light,1)); // for debugging
+  }
+}
+
+function addAmbientLights(n) {
+  for (let i = 0; i < n; i++) {
+    scene.add(ambientLights[i]);
+  }
 }
 
 function addRubiksCube(size, texture) {
@@ -175,6 +234,31 @@ function addEventListeners() {
       removeRubiksCube();
       addRubiksCube($("#select-size").val(), $(this).val());
       $("#select-pattern").val(-1);
+    }
+  });
+
+  $("#select-lighting").on('change', function() { 
+    var lighting = parseInt($(this).val());
+    var n = parseInt($("#select-lighting-amount").val());
+    if (lighting === -1) {
+      removeAllLights();
+      addAmbientLights(n);
+      isAmbientLight = true;
+    } else {
+      removeAllLights();
+      addPointLights(n);
+      isAmbientLight = false;
+    }
+  });
+
+  $("#select-lighting-amount").on('change', function() {
+    var n = parseInt($(this).val());
+
+    removeAllLights();
+    if (isAmbientLight) {
+      addAmbientLights(n);
+    } else {
+      addPointLights(n);
     }
   });
 }
