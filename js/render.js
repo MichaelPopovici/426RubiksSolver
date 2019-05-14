@@ -112,10 +112,11 @@ function addAmbientLights(n) {
   }
 }
 
-function addRubiksCube(size, texture) {
+function addRubiksCube(size, texture, specular) {
   size = size || DIMENSIONS;
   texture = texture || -1;
-  rubik = new Rubik(size, texture);
+  specular = specular || 0xffffff;
+  rubik = new Rubik(size, texture, specular);
   let cubes = rubik.cubes;
   for (let i = 0; i < cubes.length; i++) {
     scene.add(cubes[i]);
@@ -158,13 +159,14 @@ function addEventListeners() {
       addRubiksCube($("#select-size").val());
       $("#select-pattern").val(-1);
       $("#select-texture").val(-1);
+      $("#select-specular").val("#ffffff");
     }
   });
 
   $("#select-size").on('change', function() { 
     if (! rubik.isMoving) {    
       removeRubiksCube();
-      addRubiksCube($(this).val(), $("#select-texture").val());
+      addRubiksCube($(this).val(), $("#select-texture").val(), $("#select-specular").val());
       $("#select-pattern").val(-1);
 
       // hide patterns for cubes bigger than 3x3
@@ -231,9 +233,17 @@ function addEventListeners() {
 
   $("#select-texture").on('change', function() { 
     if (! rubik.isMoving) {
+      var texture = parseInt($(this).val());
       removeRubiksCube();
-      addRubiksCube($("#select-size").val(), $(this).val());
+      addRubiksCube($("#select-size").val(), texture, $("#select-specular").val());
       $("#select-pattern").val(-1);
+
+      // hide "specular" input unless texture is phong
+      if (texture === 1) {
+        $("#specular-li").show();
+      } else {
+        $("#specular-li").hide();
+      }
     }
   });
 
@@ -259,6 +269,14 @@ function addEventListeners() {
       addAmbientLights(n);
     } else {
       addPointLights(n);
+    }
+  });
+
+  $("#select-specular").on('change', function() {
+    var texture = parseInt($("#select-texture").val());
+    if (! rubik.isMoving && texture === 1) {
+      removeRubiksCube();
+      addRubiksCube($("#select-size").val(), texture, $(this).val());
     }
   });
 }

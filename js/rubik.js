@@ -60,7 +60,7 @@ function Move(depth, direction, axis) {
 * NOTATION REFERENCE:
 * https://ruwix.com/the-rubiks-cube/notation/
 */
-function Rubik(dimensions, texture) {
+function Rubik(dimensions, texture, specular) {
   this.dimensions = dimensions; // number of cubes per row/column
   this.cubes = []; // list of cubes in the Rubik's cube
   this.moves = []; // queue of moves to execute
@@ -72,6 +72,7 @@ function Rubik(dimensions, texture) {
   this.isSolving = false; // are we solving the Rubik's cube?
   this.texture = parseInt(texture); // texture of the stickers
   this.coordinates = []; // list of possible values that x, y, z components can take
+  this.specular = specular; // specular highlights for phong texture
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (dimensions - 1) * len * 0.5;
@@ -107,15 +108,16 @@ Rubik.prototype.createCube = function(x, y, z) {
       return new THREE.MeshBasicMaterial({ color: c });
     });
   }
-  else if (this.texture === 0) {
+  else if (this.texture === 4) {
     faceMaterials = COLORS.map(function(c) {
       return new THREE.MeshLambertMaterial({ color: c });
     });
   }
   // Phong texture
   else if (this.texture === 1) {
+    var specular = this.specular;
     faceMaterials = COLORS.map(function(c) {
-      return new THREE.MeshPhongMaterial( { color: c, specular: 0xffffff, shininess: 30} );
+      return new THREE.MeshPhongMaterial( { color: c, specular: specular, shininess: 30} );
     });
   }
   // Gradient texture
