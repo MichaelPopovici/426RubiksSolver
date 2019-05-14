@@ -45,14 +45,32 @@
     <li>
       <label>Textures</label>
       <select id="select-texture">
-        <option value="-1">-</option>
-        <option value="0">Gradient</option>
-        <option value="1">Floral</option>
-        <!-- <option value="2">Perlin</option> -->
+        <option value="-1">Basic</option>
+        <option value="0">Lambert</option>
+        <option value="1">Phong</option>
+        <option value="2">Gradient</option>
+        <option value="3">Floral</option>
       </select>
     </li>
-    <li><label>Keyboard Controls: F, B, L, R, U, D (Uppercase: Clockwise, lowercase: Counterclockwise)</label>
+    <li>
+      <label>Lighting</label>
+      <select id="select-lighting">
+        <option value="-1">Ambient</option>
+        <option value="0">Point Light</option>
+      </select>
     </li>
+    <li>
+      <label>Number of Lights</label>
+      <select id="select-lighting-amount">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </li>
+
+    <li><label>Keyboard Controls: F, B, L, R, U, D (Uppercase: Clockwise, lowercase: Counterclockwise)</label></li>
   </ul>
 
   <script src="libjs/jquery-2.0.3.js"></script>

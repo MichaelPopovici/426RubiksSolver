@@ -100,16 +100,26 @@ Rubik.prototype.createCube = function(x, y, z) {
   }
   cubeGeometry.colorsNeedUpdate = true;
 
-
   var faceMaterials = [];
-  // Default texture
+  // Default basic texture
   if (this.texture === -1) {  
+    faceMaterials = COLORS.map(function(c) {
+      return new THREE.MeshBasicMaterial({ color: c });
+    });
+  }
+  else if (this.texture === 0) {
     faceMaterials = COLORS.map(function(c) {
       return new THREE.MeshLambertMaterial({ color: c });
     });
   }
+  // Phong texture
+  else if (this.texture === 1) {
+    faceMaterials = COLORS.map(function(c) {
+      return new THREE.MeshPhongMaterial( { color: c, specular: 0xffffff, shininess: 30} );
+    });
+  }
   // Gradient texture
-  else if (this.texture === 0) {
+  else if (this.texture === 2) {
     for (let i = 0; i < COLORS.length; i++) {
       var c = COLORS[i];
 
@@ -158,7 +168,7 @@ Rubik.prototype.createCube = function(x, y, z) {
     }
   }
   // Floral texture
-  else if (this.texture === 1) {
+  else if (this.texture === 3) {
     const loader = new THREE.TextureLoader();
     faceMaterials = [
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-1.png')}),
@@ -169,10 +179,7 @@ Rubik.prototype.createCube = function(x, y, z) {
       new THREE.MeshBasicMaterial({map: loader.load('images/flower-6.png')}),
     ];
   }
-  // Perlin texture
-  else if (this.texture === 2) {
 
-  }
   cube = new THREE.Mesh(cubeGeometry, faceMaterials);
   cube.castShadow = true;
 
