@@ -279,11 +279,12 @@ function addEventListeners() {
     }
   });
 
-  $("#select-shininess").on('change', function() {
+  var slider = document.getElementById("select-shininess");
+  slider.oninput = function() {
     if (! rubik.isMoving) {
       resetRubiksCube();
     }
-  });
+  }
 }
 
 function resetRubiksCube() {
