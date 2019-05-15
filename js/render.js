@@ -163,14 +163,14 @@ function addEventListeners() {
     }
   });
 
-  $("#select-size").on('change', function() { 
+  $("#select-size").on('change', function() {
+    var size = parseInt($("#select-size").val());
+
     if (! rubik.isMoving) {    
-      removeRubiksCube();
-      addRubiksCube($(this).val(), $("#select-texture").val(), $("#select-specular").val());
-      $("#select-pattern").val(-1);
+      resetRubiksCube();
 
       // hide patterns for cubes bigger than 3x3
-      if ($(this).val() !== "3") {
+      if (size !== 3) {
         $("#pattern-li").hide()
       } else {
         $("#pattern-li").show()
@@ -288,7 +288,7 @@ function addEventListeners() {
 }
 
 function resetRubiksCube() {
-  var size = $("#select-size").val();
+  var size = parseInt($("#select-size").val());
   var texture = parseInt($("#select-texture").val());
   var specular = $("#select-specular").val();
   var shininess = $("#select-shininess").val();
