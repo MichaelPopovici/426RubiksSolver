@@ -5,9 +5,6 @@ var COLORS = [0xFF5900, 0xB90000, 0x0045AD, 0x009B48, 0xFFD500, 0xEEEEEE];
 var CUBE_SIZE = 0.5; // length of each cube side
 var SPACE_BETWEEN_CUBES = CUBE_SIZE / 100; // spacing between each cube
 
-// TODO: Allow user to choose rotation speed
-var ROTATION_SPEED = 0.15; // speed of cube rotation
-
 // https://stackoverflow.com/questions/20089098/three-js-adding-and-removing-children-of-rotated-objects
 var pivot = new THREE.Object3D();
 
@@ -60,7 +57,7 @@ function Move(depth, direction, axis) {
 * NOTATION REFERENCE:
 * https://ruwix.com/the-rubiks-cube/notation/
 */
-function Rubik(dimensions, texture, specular, shininess) {
+function Rubik(dimensions, texture, specular, shininess, speed) {
   this.dimensions = dimensions; // number of cubes per row/column
   this.cubes = []; // list of cubes in the Rubik's cube
   this.moves = []; // queue of moves to execute
@@ -74,6 +71,7 @@ function Rubik(dimensions, texture, specular, shininess) {
   this.coordinates = []; // list of possible values that x, y, z components can take
   this.specular = specular; // specular highlights for phong texture
   this.shininess = shininess; // shininess of material for phong texture
+  this.rotationSpeed = speed; // speed of rotation
 
   var len = CUBE_SIZE + SPACE_BETWEEN_CUBES;
   var offset = (dimensions - 1) * len * 0.5;
@@ -245,7 +243,7 @@ Rubik.prototype.rotate = function() {
     this.moveComplete();
   } else {
     // otherwise continue rotating
-    pivot.rotation[axis] += direction * ROTATION_SPEED;
+    pivot.rotation[axis] += direction * this.rotationSpeed;
   }
 }
 

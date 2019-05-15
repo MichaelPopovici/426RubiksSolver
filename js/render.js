@@ -8,6 +8,7 @@ var cubeObject;
 var cubeGeometry;
 var cubeMaterial;
 
+var ROTATION_SPEED = 0.15; // speed of cube rotation
 var DIMENSIONS = 3; // default is a 3x3 cube
 var rubik;
 
@@ -112,12 +113,13 @@ function addAmbientLights(n) {
   }
 }
 
-function addRubiksCube(size, texture, specular, shininess) {
+function addRubiksCube(size, texture, specular, shininess, speed) {
   size = size || DIMENSIONS;
   texture = texture || -1;
   specular = specular || 0xffffff;
   shininess = shininess || 30;
-  rubik = new Rubik(size, texture, specular, shininess);
+  speed = speed || ROTATION_SPEED;
+  rubik = new Rubik(size, texture, specular, shininess, speed);
   let cubes = rubik.cubes;
   for (let i = 0; i < cubes.length; i++) {
     scene.add(cubes[i]);
@@ -135,6 +137,11 @@ function addEventListeners() {
   window.addEventListener("resize", onWindowResize, false);
 
   document.addEventListener("keydown", onKeyDown, false);
+
+  var speed = document.getElementById("select-speed");
+  speed.oninput = function() {
+    rubik.rotationSpeed = speed.value / 100;
+  }
 
   // TODO: Allow user to select number of moves for shuffle
   $("#button-shuffle").on('click', function(e) {
@@ -292,9 +299,10 @@ function resetRubiksCube() {
   var texture = parseInt($("#select-texture").val());
   var specular = $("#select-specular").val();
   var shininess = $("#select-shininess").val();
+  var speed = parseInt($("#select-speed").val()) / 100;
 
   removeRubiksCube();
-  addRubiksCube(size, texture, specular, shininess);
+  addRubiksCube(size, texture, specular, shininess, speed);
   $("#select-pattern").val(-1);
 }
 
