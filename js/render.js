@@ -112,11 +112,12 @@ function addAmbientLights(n) {
   }
 }
 
-function addRubiksCube(size, texture, specular) {
+function addRubiksCube(size, texture, specular, shininess) {
   size = size || DIMENSIONS;
   texture = texture || -1;
   specular = specular || 0xffffff;
-  rubik = new Rubik(size, texture, specular);
+  shininess = shininess || 30;
+  rubik = new Rubik(size, texture, specular, shininess);
   let cubes = rubik.cubes;
   for (let i = 0; i < cubes.length; i++) {
     scene.add(cubes[i]);
@@ -138,7 +139,7 @@ function addEventListeners() {
   // TODO: Allow user to select number of moves for shuffle
   $("#button-shuffle").on('click', function(e) {
     e.preventDefault();
-    var nMoves = 20 + Math.floor(20 * Math.random());
+    var nMoves = 40 + Math.floor(20 * Math.random());
     rubik.shuffle(nMoves);
   });
 
@@ -155,11 +156,10 @@ function addEventListeners() {
   $("#button-reset").on('click', function(e) {
     e.preventDefault();
     if (! rubik.isMoving) {    
-      removeRubiksCube();
-      addRubiksCube($("#select-size").val());
-      $("#select-pattern").val(-1);
       $("#select-texture").val(-1);
       $("#select-specular").val("#ffffff");
+
+      resetRubiksCube();
     }
   });
 
@@ -232,17 +232,18 @@ function addEventListeners() {
   });
 
   $("#select-texture").on('change', function() { 
-    if (! rubik.isMoving) {
-      var texture = parseInt($(this).val());
-      removeRubiksCube();
-      addRubiksCube($("#select-size").val(), texture, $("#select-specular").val());
-      $("#select-pattern").val(-1);
+    var texture = parseInt($("#select-texture").val());
 
-      // hide "specular" input unless texture is phong
+    if (! rubik.isMoving) {
+      resetRubiksCube();
+
+      // hide "specular" and "shininess" input unless texture is phong
       if (texture === 1) {
         $("#specular-li").show();
+        $("#shininess-li").show();
       } else {
         $("#specular-li").hide();
+        $("#shininess-li").hide();
       }
     }
   });
@@ -273,12 +274,27 @@ function addEventListeners() {
   });
 
   $("#select-specular").on('change', function() {
-    var texture = parseInt($("#select-texture").val());
-    if (! rubik.isMoving && texture === 1) {
-      removeRubiksCube();
-      addRubiksCube($("#select-size").val(), texture, $(this).val());
+    if (! rubik.isMoving) {
+      resetRubiksCube();
     }
   });
+
+  $("#select-shininess").on('change', function() {
+    if (! rubik.isMoving) {
+      resetRubiksCube();
+    }
+  });
+}
+
+function resetRubiksCube() {
+  var size = $("#select-size").val();
+  var texture = parseInt($("#select-texture").val());
+  var specular = $("#select-specular").val();
+  var shininess = $("#select-shininess").val();
+
+  removeRubiksCube();
+  addRubiksCube(size, texture, specular, shininess);
+  $("#select-pattern").val(-1);
 }
 
 function onKeyDown(event) {
